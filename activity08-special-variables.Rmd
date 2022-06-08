@@ -1,6 +1,6 @@
 ---
 title: "Activity 8"
-author: "Name"
+author: "Nick"
 output: github_document
 ---
 
@@ -11,6 +11,14 @@ Load the entirety of the `{tidyverse}`.
 If you wish to work with dates during this activity, you will need to also load `{lubridate}`.
 Be sure to avoid printing out any unnecessary information and give the code chunk a meaningful name.
 
+```{r loading tidyverse}
+
+knitr::opts_chunk$set(error = TRUE)
+
+library(tidyverse)
+
+library(lubridate)
+```
 
 
 
@@ -25,6 +33,11 @@ Notice that this file is a tab-delimited file that is stored as a `.txt` file.
 Therefore, you will need to use either `read_delim` with a `delim = ...` argument or (better) `read_tsv` .
 Assign the file to a meaningful object name, be sure to avoid printing any unnecessary information, and give the code chunk a meaningful name.
 
+```{r loading data in this box}
+
+billboard_songs <- read_tsv(here::here("data","billboard_songs.txt"))
+
+```
 
 
 
@@ -43,11 +56,15 @@ This is a long dataset (34,605 observations)!
 You might like to create a small dataset with only, say, 200 of the rows to try all your code out on the smaller dataset first, and then only run the analysis of the full data after you have experienced everything.
 One way to do this is to use a function like `slice_sample(n = ...)` from `{dplyr}`.
 
+```{r smaller data}
+
+
+smol_billboard <- billboard_songs %>%
+slice_sample(n = 200)
+
+
 ```
-# Randomly sample 200 rows
-dataset %>% 
-  slice_sample(n = 200)
-```
+
 
 If you wish to work with `{stringr}`, I find it useful to work on vectors first.
 A way to do this is with `pull` from `{dplyr}`.
@@ -57,6 +74,17 @@ A way to do this is with `pull` from `{dplyr}`.
 dataset %>% 
   pull(variable)
 ```
+
+```{r we are pulling}
+
+smol_billboard %>%
+  pull(title)
+
+```
+
+
+
+
 
 ## Analysis
 
@@ -71,6 +99,41 @@ Assuming you were 16 years old by 2015.
 - Which artist has been **featured** on the most Billboard charting songs?
 - Which artist has **collaborated** on the most Billboard charting songs?
 - Create some data visualization controlling the order of the character/string variables.
+
+```{r top 10 songs of all time? I think}
+
+smol_billboard %>%
+  # group_by(`weeks on chart`) %>%
+  # arrange(desc(by = `weeks on chart`)) %>%
+  # head()
+  slice_max(`weeks on chart`, n=10)
+
+
+```
+```{r what distinct date did the oldest song leave the charts?}
+
+
+
+smol_billboard %>%
+ mutate(chart_date = ymd(`chart date`), leave_chart = `weeks on chart` * 7, y = as.Date(chart_date + leave_chart)) %>%
+  slice_min(chart_date) 
+
+
+```
+
+
+```{r What songs could have been played at your 16th birthday party?}
+
+Nick_birthday <- ymd("19960715")
+
+billboard_songs %>%
+  mutate(chart_date = ymd(`chart date`))%>%
+  filter(year(chart_date) == 2012)
+
+```
+
+
+
 
 ## Attribution
 
